@@ -14,7 +14,7 @@ Natsuki Live is a GPL-licensed recreation of the existing live wallpaper "Animat
 1. Install any live wallpaper app for your OS that supports website/HTML.  
    **Note:** I recommend using [Lively Wallpaper](https://github.com/rocksdanister/lively), another FOSS. I don't provide support for any other wallpaper app.
    
-2. Copy the GitHub Pages URL or download the zip from the [releases](./releases) and extract it to your desired location.
+2. Copy the GitHub Pages URL or download the zip from the [releases](https://github.com/SpoiledUnknown/Natsuki-Live/releases/tag/v0.6.3) and extract it to your desired location.
 
 3. Set it inside the wallpaper app:  
    3.1. Open **Lively Wallpaper**.  
