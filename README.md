@@ -1,8 +1,8 @@
-# Natsulki Live
+# Natsuki Live
 
-Natsulki Live is a GPL-licensed recreation of the existing live wallpaper "Animated Natsuki" by GezzaBeat, featuring the fictional character Natsuki from *Doki Doki Literature Club Plus* (DDLCP).
+Natsuki Live is a GPL-licensed recreation of the existing live wallpaper "Animated Natsuki" by GezzaBeat, featuring the fictional character Natsuki from *Doki Doki Literature Club Plus* (DDLCP).
 
-![Natsulki Live Preview](./public/Natsuki.webp)
+![Natsuki Live Preview](./public/Natsuki.webp)
 
 ## Features
 1. 2k images
