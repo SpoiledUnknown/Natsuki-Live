@@ -1,5 +1,19 @@
-let baseImage, blushImage, poutImage, rightEyeImage, leftEyeImage, currentImage;
-let baseBody, rightEye, leftEye, face;
+let blinkAnime, stareAnime;
+let blushImage,
+  smileImage,
+  poutImage,
+  rightEyeImage,
+  leftEyeImage,
+  bothEyesCloseImage,
+  rightEyeClosed,
+  leftEyeClosed,
+  currentImage;
+
+let baseSprite, smileSprite, poutSprite, blushSprite, rightEyeSprite, leftEyeSprit, facialExpression;
+let faceTrigger, leftEyeTrigger, rightEyeTrigger, headTrigger;
+
+const screenWidth = 1366;
+const screenHeight = 768;
 
 const maxRightEyeMovementX = 15;
 const maxRightEyeMovementY = 7;
@@ -22,36 +36,76 @@ const hoverDelay = 2000;
 let hoverExitTime = 0;
 let havePressedNatsuki = false;
 
+const blinkDuration = 45;
+let lastBlinkFrame = 0;
+
 function preload() {
-  baseImage = loadImage("./public/Look.webp");
+  blinkAnime = loadAnimation(
+    "./public/1.webp",
+    "./public/2.webp",
+    "./public/3.webp",
+    "./public/3.webp",
+    "./public/2.webp",
+    "./public/1.webp"
+  );
+  stareAnime = loadAnimation("./public/1.webp");
+
+  bothEyesCloseImage = loadImage("./public/3.webp");
+  rightEyeClosed = loadImage("./public/RightEyeClosed.webp");
+  leftEyeClosed = loadImage("./public/LeftEyeClosed.webp");
+
+  smileImage = loadImage("./public/Smile.webp");
   blushImage = loadImage("./public/Blush.webp");
   poutImage = loadImage("./public/Pout.webp");
-  rightEyeImage = loadImage("./public/RightEye.webp");
-  leftEyeImage = loadImage("./public/LeftEye.webp");
+  rightEyeImage = loadImage("./public/EyeRight.webp");
+  leftEyeImage = loadImage("./public/EyeLeft.webp");
 }
 
 function setup() {
-  createCanvas(1366, 768);
+  createCanvas(screenWidth, screenHeight);
 
-  baseImage.resize(1366, 800);
-  blushImage.resize(1366, 800);
-  poutImage.resize(1366, 800);
-  rightEyeImage.resize(1366, 800);
-  leftEyeImage.resize(1366, 800);
+  smileImage.resize(screenWidth, screenHeight);
+  blushImage.resize(screenWidth, screenHeight);
+  poutImage.resize(screenWidth, screenHeight);
+  rightEyeImage.resize(screenWidth, screenHeight);
+  leftEyeImage.resize(screenWidth, screenHeight);
+  bothEyesCloseImage.resize(screenWidth, screenHeight);
+  rightEyeClosed.resize(screenWidth, screenHeight);
+  leftEyeClosed.resize(screenWidth, screenHeight);
 
-  leftEye = createSprite(1366 / 2, 768 / 2, 1366, 768);
-  leftEye.addImage(leftEyeImage);
+  leftEyeSprit = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
 
-  rightEye = createSprite(1366 / 2, 768 / 2, 1366, 768);
-  rightEye.addImage(rightEyeImage);
+  leftEyeSprit.addImage(leftEyeImage);
 
-  baseBody = createSprite(1366 / 2, 768 / 2, 1366, 768);
-  baseBody.addImage(baseImage);
-  currentImage = baseImage;
+  rightEyeSprite = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
+  rightEyeSprite.addImage(rightEyeImage);
 
-  face = createSprite(900, 450, 275, 275);
-  face.mouseActive = true;
-  face.visible = false;
+  baseSprite = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
+  baseSprite.addAnimation("stare", stareAnime);
+  baseSprite.scale = screenWidth / 2548;
+
+  smileSprite = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
+  smileSprite.addImage(smileImage);
+  currentImage = smileImage;
+
+  facialExpression = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
+  facialExpression.visible = false;
+
+  faceTrigger = createSprite(screenWidth / 2 + 225, screenHeight / 2 + 100, 150, 150);
+  faceTrigger.mouseActive = true;
+  faceTrigger.visible = false;
+
+  leftEyeTrigger = createSprite(screenWidth / 2 + 115, screenHeight / 2 + 75, 50, 50);
+  leftEyeTrigger.mouseActive = true;
+  leftEyeTrigger.visible = false;
+
+  rightEyeTrigger = createSprite(screenWidth / 2 + 280, screenHeight / 2 - 10, 60, 60);
+  rightEyeTrigger.mouseActive = true;
+  rightEyeTrigger.visible = false;
+
+  headTrigger = createSprite(screenWidth / 2 + 150, screenHeight / 2 - 170, 350, 200);
+  headTrigger.mouseActive = true;
+  headTrigger.visible = false;
 }
 
 function draw() {
@@ -59,7 +113,30 @@ function draw() {
   frameRate(60);
   drawSprites();
 
-  if (face.mouseIsOver) {
+  Blink();
+  HandleMoutAnimation();
+  HandleLeftEyeMovement();
+  HandleRightEyeMovement();
+  HandleEyeAnimation();
+}
+
+function HandleEyeAnimation() {
+  if (headTrigger.mouseIsPressed) {
+    facialExpression.visible = true;
+    facialExpression.addImage(bothEyesCloseImage);
+  } else if (rightEyeTrigger.mouseIsOver) {
+    facialExpression.visible = true;
+    facialExpression.addImage(rightEyeClosed);
+  } else if (leftEyeTrigger.mouseIsOver) {
+    facialExpression.visible = true;
+    facialExpression.addImage(leftEyeClosed);
+  } else {
+    facialExpression.visible = false;
+  }
+}
+
+function HandleMoutAnimation() {
+  if (faceTrigger.mouseIsOver) {
     if (havePressedNatsuki) {
       currentImage = poutImage;
       hoverExitTime = millis();
@@ -70,50 +147,52 @@ function draw() {
     }
   } else {
     if (millis() - hoverExitTime > hoverDelay) {
-      currentImage = baseImage;
+      currentImage = smileImage;
       havePressedNatsuki = false;
     }
   }
 
-  baseBody.addImage(currentImage);
+  smileSprite.addImage(currentImage);
 
-  HandleRightEyeMovement();
-  HandleLeftEyeMovement();
-
-  if (face.mouseIsPressed) {
+  if (faceTrigger.mouseIsPressed && !(leftEyeTrigger.mouseIsOver || rightEyeTrigger.mouseIsOver)) {
     if (havePressedNatsuki) return;
     havePressedNatsuki = true;
   }
 }
 
+function Blink() {
+  if (frameCount % 360 === 0 && frameCount !== lastBlinkFrame) {
+    baseSprite.addAnimation("stare", blinkAnime);
+    lastBlinkFrame = frameCount;
+  }
+
+  if (frameCount >= lastBlinkFrame + blinkDuration) {
+    baseSprite.addAnimation("stare", stareAnime);
+  }
+}
+
 function HandleRightEyeMovement() {
-  let mouseXRel = mouseX - rightEye.position.x;
-  let mouseYRel = mouseY - rightEye.position.y;
+  let mouseXRel = mouseX - rightEyeSprite.position.x;
+  let mouseYRel = mouseY - rightEyeSprite.position.y;
 
   let distance = dist(0, 0, mouseXRel, mouseYRel);
 
-  let maxDistance = Math.sqrt(
-    maxRightEyeMovementX ** 2 + maxRightEyeMovementY ** 2
-  );
+  let maxDistance = Math.sqrt(maxRightEyeMovementX ** 2 + maxRightEyeMovementY ** 2);
 
   if (
-    (mouseX > deadZoneXMin &&
-      mouseX < deadZoneXMax &&
-      mouseY > deadZoneYMin &&
-      mouseY < deadZoneYMax) ||
-    havePressedNatsuki
+    (mouseX > deadZoneXMin && mouseX < deadZoneXMax && mouseY > deadZoneYMin && mouseY < deadZoneYMax) ||
+    havePressedNatsuki ||
+    faceTrigger.mouseIsOver ||
+    leftEyeTrigger.mouseIsOver
   ) {
-    rightEye.position.x +=
-      (1366 / 2 - rightEye.position.x) * movementSpeed * easingFactor;
-    rightEye.position.y +=
-      (768 / 2 - rightEye.position.y) * movementSpeed * easingFactor;
+    rightEyeSprite.position.x += (screenWidth / 2 - rightEyeSprite.position.x) * movementSpeed * easingFactor;
+    rightEyeSprite.position.y += (screenHeight / 2 - rightEyeSprite.position.y) * movementSpeed * easingFactor;
 
     if (
-      dist(rightEye.position.x, rightEye.position.y, 1366 / 2, 768 / 2) <=
-      snapThreshold
+      dist(rightEyeSprite.position.x, rightEyeSprite.position.y, screenWidth / 2, screenHeight / 2) <= snapThreshold
     ) {
-      rightEye.position.x = 1366 / 2;
-      rightEye.position.y = 768 / 2;
+      rightEyeSprite.position.x = screenWidth / 2;
+      rightEyeSprite.position.y = screenHeight / 2;
     }
 
     return;
@@ -125,50 +204,42 @@ function HandleRightEyeMovement() {
       mouseYRel = (mouseYRel / distance) * maxDistance;
     }
 
-    rightEye.position.x += mouseXRel * movementSpeed;
-    rightEye.position.y += mouseYRel * movementSpeed;
+    rightEyeSprite.position.x += mouseXRel * movementSpeed;
+    rightEyeSprite.position.y += mouseYRel * movementSpeed;
 
-    rightEye.position.x = constrain(
-      rightEye.position.x,
-      1366 / 2 - maxRightEyeMovementX,
-      1366 / 2 + maxRightEyeMovementX
+    rightEyeSprite.position.x = constrain(
+      rightEyeSprite.position.x,
+      screenWidth / 2 - maxRightEyeMovementX,
+      screenWidth / 2 + maxRightEyeMovementX
     );
-    rightEye.position.y = constrain(
-      rightEye.position.y,
-      768 / 2 - maxRightEyeMovementY,
-      768 / 2 + maxRightEyeMovementY
+    rightEyeSprite.position.y = constrain(
+      rightEyeSprite.position.y,
+      screenHeight / 2 - maxRightEyeMovementY,
+      screenHeight / 2 + maxRightEyeMovementY
     );
   }
 }
 
 function HandleLeftEyeMovement() {
-  let mouseXRel = mouseX - leftEye.position.x;
-  let mouseYRel = mouseY - leftEye.position.y;
+  let mouseXRel = mouseX - leftEyeSprit.position.x;
+  let mouseYRel = mouseY - leftEyeSprit.position.y;
 
   let distance = dist(0, 0, mouseXRel, mouseYRel);
 
-  let maxDistance = Math.sqrt(
-    maxLeftEyeMovementX ** 2 + maxLeftEyeMovementY ** 2
-  );
+  let maxDistance = Math.sqrt(maxLeftEyeMovementX ** 2 + maxLeftEyeMovementY ** 2);
 
   if (
-    (mouseX > deadZoneXMin &&
-      mouseX < deadZoneXMax &&
-      mouseY > deadZoneYMin &&
-      mouseY < deadZoneYMax) ||
-    havePressedNatsuki
+    (mouseX > deadZoneXMin && mouseX < deadZoneXMax && mouseY > deadZoneYMin && mouseY < deadZoneYMax) ||
+    havePressedNatsuki ||
+    faceTrigger.mouseIsOver ||
+    rightEyeTrigger.mouseIsOver
   ) {
-    leftEye.position.x +=
-      (1366 / 2 - leftEye.position.x) * movementSpeed * easingFactor;
-    leftEye.position.y +=
-      (768 / 2 - leftEye.position.y) * movementSpeed * easingFactor;
+    leftEyeSprit.position.x += (screenWidth / 2 - leftEyeSprit.position.x) * movementSpeed * easingFactor;
+    leftEyeSprit.position.y += (screenHeight / 2 - leftEyeSprit.position.y) * movementSpeed * easingFactor;
 
-    if (
-      dist(leftEye.position.x, leftEye.position.y, 1366 / 2, 768 / 2) <=
-      snapThreshold
-    ) {
-      leftEye.position.x = 1366 / 2;
-      leftEye.position.y = 768 / 2;
+    if (dist(leftEyeSprit.position.x, leftEyeSprit.position.y, screenWidth / 2, screenHeight / 2) <= snapThreshold) {
+      leftEyeSprit.position.x = screenWidth / 2;
+      leftEyeSprit.position.y = screenHeight / 2;
     }
 
     return;
@@ -180,18 +251,18 @@ function HandleLeftEyeMovement() {
       mouseYRel = (mouseYRel / distance) * maxDistance;
     }
 
-    leftEye.position.x += mouseXRel * movementSpeed;
-    leftEye.position.y += mouseYRel * movementSpeed;
+    leftEyeSprit.position.x += mouseXRel * movementSpeed;
+    leftEyeSprit.position.y += mouseYRel * movementSpeed;
 
-    leftEye.position.x = constrain(
-      leftEye.position.x,
-      1366 / 2 - maxLeftEyeMovementX - 18,
-      1366 / 2 + maxLeftEyeMovementX
+    leftEyeSprit.position.x = constrain(
+      leftEyeSprit.position.x,
+      screenWidth / 2 - maxLeftEyeMovementX - 18,
+      screenWidth / 2 + maxLeftEyeMovementX
     );
-    leftEye.position.y = constrain(
-      leftEye.position.y,
-      768 / 2 - maxLeftEyeMovementY,
-      768 / 2 + maxLeftEyeMovementY
+    leftEyeSprit.position.y = constrain(
+      leftEyeSprit.position.y,
+      screenHeight / 2 - maxLeftEyeMovementY,
+      screenHeight / 2 + maxLeftEyeMovementY
     );
   }
 }

@@ -1,2 +1,24 @@
-# DDLC-Live-Wallpapers
-Animated Natsuki wallpaper which someone created using wallpaper engine recreated by me so that anyone can use this with any engine (I only support Lively Wallpaper).
+# Natsulki Live
+
+Natsulki Live is a GPL-licensed recreation of the existing live wallpaper "Animated Natsuki" by GezzaBeat, featuring the fictional character Natsuki from *Doki Doki Literature Club Plus* (DDLCP).
+
+![Natsulki Live Preview](./public/Natsuki.webp)
+
+## Features
+1. 2k images
+2. DDLC "Play With Me" song
+3. Facial expression
+
+## How to Install
+
+1. Install any live wallpaper app for your OS that supports website/HTML.  
+   **Note:** I recommend using [Lively Wallpaper](https://github.com/rocksdanister/lively), another FOSS. I don't provide support for any other wallpaper app.
+   
+2. Copy the GitHub Pages URL or download the zip from the [releases](./releases) and extract it to your desired location.
+
+3. Set it inside the wallpaper app:  
+   3.1. Open **Lively Wallpaper**.  
+   3.2. Click on the plus (+) button in the top right.  
+   3.3. Select the wallpaper.
+
+That's it! For any tips and suggestions, feel free to create an issue or join the [Discord](https://discord.gg/YykdmCjzmQ) server.
