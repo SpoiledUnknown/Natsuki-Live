@@ -34,8 +34,10 @@
 ## How to Install
 
 1. Install any live wallpaper app for your OS that supports Website/HTML.
-   > [!NOTE]
-   > I recommend using [Lively Wallpaper](https://github.com/rocksdanister/lively), another Free And Open Source Software _(FOSS)_. I don't provide setup support for any other wallpaper app.
+
+> [!NOTE]
+> I recommend using [Lively Wallpaper](https://github.com/rocksdanister/lively), another Free And Open Source Software _(FOSS)_. I don't provide setup support for any other wallpaper app.
+
 2. Copy the GitHub Pages URL or download the zip from the [releases](https://github.com/SpoiledUnknown/Natsuki-Live/releases/tag/v0.6.7) and extract it to your desired location.
 
 3. Set it inside the wallpaper app:
