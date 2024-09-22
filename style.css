@@ -49,7 +49,7 @@ body {
   left: -30rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: clamp(0.75rem, 1rem, 2rem);
   align-items: center;
   padding: 2rem;
   height: 100vh;
@@ -72,6 +72,10 @@ body {
   color: var(--clr-textLight);
   font-weight: 500;
   font-size: var(--size-2xl);
+}
+
+.warning {
+  text-align: center;
 }
 
 a {
