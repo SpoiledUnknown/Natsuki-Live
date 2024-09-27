@@ -41,20 +41,6 @@ const framerates = 60;
  */
 const movementSpeed = 2.5;
 const easingFactor = 0.1; /* You could leave this as is or try to play with this if you want to. */
-
-/**
- * If you have changed the resolution then,
- * be sure to change all 4 variable given below else,
- * you will see some odd glitches in natsuki's eyes,
- * which will make her even more scarier.
- * 
- * You will have to test and find them yourself,
- * If you have a hard time doing this then try to contact me.
-*/
-const deadZoneXMin = 665;
-const deadZoneXMax = 710;
-const deadZoneYMin = 368;
-const deadZoneYMax = 400;
 const snapThreshold = 3;
 
 const hoverDelay = 2000;
@@ -138,6 +124,10 @@ function setup() {
   headTrigger = createSprite(screenWidth / 2 + 150, screenHeight / 2 - 170, 350, 200);
   headTrigger.mouseActive = true;
   headTrigger.visible = false;
+
+  screenCenter = createSprite(screenWidth / 2, screenHeight / 2, 50, 50);
+  screenCenter.mouseActive = true;
+  screenCenter.visible = false;
 }
 
 /**
@@ -214,12 +204,7 @@ function HandleRightEyeMovement() {
 
   let maxDistance = Math.sqrt(maxRightEyeMovementX ** 2 + maxRightEyeMovementY ** 2);
 
-  if (
-    (mouseX > deadZoneXMin && mouseX < deadZoneXMax && mouseY > deadZoneYMin && mouseY < deadZoneYMax) ||
-    havePressedNatsuki ||
-    faceTrigger.mouseIsOver ||
-    leftEyeTrigger.mouseIsOver
-  ) {
+  if (screenCenter.mouseIsOver || havePressedNatsuki || faceTrigger.mouseIsOver || leftEyeTrigger.mouseIsOver) {
     rightEyeSprite.position.x += (screenWidth / 2 - rightEyeSprite.position.x) * movementSpeed * easingFactor;
     rightEyeSprite.position.y += (screenHeight / 2 - rightEyeSprite.position.y) * movementSpeed * easingFactor;
 
@@ -263,12 +248,7 @@ function HandleLeftEyeMovement() {
 
   let maxDistance = Math.sqrt(maxLeftEyeMovementX ** 2 + maxLeftEyeMovementY ** 2);
 
-  if (
-    (mouseX > deadZoneXMin && mouseX < deadZoneXMax && mouseY > deadZoneYMin && mouseY < deadZoneYMax) ||
-    havePressedNatsuki ||
-    faceTrigger.mouseIsOver ||
-    rightEyeTrigger.mouseIsOver
-  ) {
+  if (screenCenter.mouseIsOver || havePressedNatsuki || faceTrigger.mouseIsOver || rightEyeTrigger.mouseIsOver) {
     leftEyeSprit.position.x += (screenWidth / 2 - leftEyeSprit.position.x) * movementSpeed * easingFactor;
     leftEyeSprit.position.y += (screenHeight / 2 - leftEyeSprit.position.y) * movementSpeed * easingFactor;
 
