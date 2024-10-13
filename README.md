@@ -23,13 +23,14 @@
 
 ## ✨ Key Features
 
-- 2K Textures
+- 1440p Textures
 - DDLC "Play With Me" song
   - Hover to the left side of the wallpaper to access the menu
-- Facial Expression
-- 30/60 FPS support
-- 100% Free
-- Your own Natsuki
+- Eye Blink animation
+- Facial Expresions (Pout, Blush, Smile and Surprised)
+- Variable Refresh Rate Support (change it inside code)
+- Auto Resolution Scaling
+- Windows/Linux Support, idk about MacOS tho :(
 
 ## How to Install
 
@@ -38,69 +39,33 @@
 > [!NOTE]
 > I recommend using [Lively Wallpaper](https://github.com/rocksdanister/lively), another Free And Open Source Software _(FOSS)_. I don't provide setup support for any other wallpaper app.
 
-2. Copy the GitHub Pages URL or download the zip from the [releases](https://github.com/SpoiledUnknown/Natsuki-Live/releases/tag/v0.6.8) and extract it to your desired location.
+2. Copy the GitHub Pages URL or download the zip from the [releases](https://github.com/SpoiledUnknown/Natsuki-Live/releases/) and extract it to your desired location.
 
 3. Set it inside the wallpaper app:
    1. Open **Lively Wallpaper**.
    2. Click on the plus (+) button in the top right.
-   3. Select the wallpaper _(Optional)_.
+   3. Select the wallpaper.
    4. Enter the name and description
-      - Adding a name and description helps you remember and distinguish between you other wallpapers
+      - Adding a name and description helps you remember and distinguish between your other wallpapers
    5. rescale the thumbnail _(Optional)_.
       - This also helps in remembering and distinguishing.
    6. You are good to **GO!**
 
-## How set correct Screen Resolution
+## Changelog:
+### Version - 0.7.0
+- Fixed several spelling mistakes and typos across the entire project.
+- Fixed several bad image editing artifacts.
+- Added support for all 16:9 ratio displays
+  - Support for 16:10 is also in development and will come with v0.7.1
+- Added a completely new reaction `Surpised Natsuki`
+- Added support for Automatic rescaling based on both Image Size and Screen Size
+  - Automatically determines which one will provide the best looking result and use that instead.
+- Reduced the size from 12.7mb to just 6.4mb `Nearly 50%` while extending functionality.
+- Added a config.json file for easy editing of the values.
 
-### Method 1 (Easy):
+Also I am considering a Natsuki Live wallpaper for Mobile/Android devices as well, which will have toned down interaction as well. This was originally suggested by [u/Superb_Temporary_258](https://www.reddit.com/user/Superb_Temporary_258/) from DDLC subreddit. Since I lack the technical skills and a development device that could handle Android Studio, so I can't make it right now but maybe in the future.
 
-1. Open the **_main.js_** file in text editor (like vscode or notepad)
-2. Find and change the screen width and height to your screen's native resolution in variables
-
-```javascript
-const screenWidth = 1366;
-const screenHeight = 768;
-```
-
-> [!NOTE]
-> I have provided comment inside the code to make it easier for even the non-programmers.
-> If you get any error feel free to contact me throuth the given below link. 3. Run and see the changes.
-
-### Method 2 :
-
-1. Open **_public_** folder.
-2. Resize the images to your screens native resolution.
-3. Find and change the screen width and height to your screen's native resolution in variables
-
-```javascript
-const screenWidth = 1366;
-const screenHeight = 768;
-```
-
-> [!NOTE]
-> I have provided comment inside the code to make it easier for even the non-programmers.
-> If you get any error feel free to contact me throuth the given below link.
-
-4. Just below width and height variable, change the imageWidth variable to the one you changed in Step 2.
-
-```javascript
-const imageWidth = 2548;
-```
-
-5. thats it!
-
-> [!NOTE]
-> Doesn't matter which method you use, you still have to change the following variables
-
-```javascript
-const deadZoneXMin = 665;
-const deadZoneXMax = 710;
-const deadZoneYMin = 368;
-const deadZoneYMax = 400;
-const snapThreshold = 3;
-```
-
-> Goodluck!!
+And yeah, no IOS wallpaper since Apple doesn't allow this much freedom. Better get Panels subscription then `jk ;)`
 
 ## Need Help? or wanna give feedback?
 

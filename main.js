@@ -7,14 +7,19 @@ let blushImage,
   bothEyesCloseImage,
   rightEyeClosed,
   leftEyeClosed,
+  surprisedImage,
   currentImage;
 
-let baseSprite, smileSprite, poutSprite, blushSprite, rightEyeSprite, leftEyeSprit, facialExpression;
-let faceTrigger, leftEyeTrigger, rightEyeTrigger, headTrigger;
+let baseSprite, smileSprite, poutSprite, blushSprite, rightEyeSprite, leftEyeSprite, facialExpression;
+let faceTrigger, leftEyeTrigger, rightEyeTrigger, headTrigger, surprisedTrigger;
 
-const screenWidth = 1366; /* Change this to your screen's width */
-const screenHeight = 768; /* Change this to your screen's height */
-const imageWidth = 2548; /* Do not change this unless you have modified the images themselves */
+let screenWidth;
+let screenHeight;
+
+let imageWidth;
+let imageHeight;
+
+let frameRates;
 
 const maxRightEyeMovementX = 15;
 const maxRightEyeMovementY = 7;
@@ -22,24 +27,7 @@ const maxRightEyeMovementY = 7;
 const maxLeftEyeMovementX = 5;
 const maxLeftEyeMovementY = 7;
 
-/** Frame Rates
- * Although the default fps used to be 30, but I change it to 60.
- * I don't recommend going above than this, I you still want to do that then,
- * keep in mind that I don't take any resposibility and more fps === more power/resource usage.
- */
-const framerates = 60;
-
-/** Movement Speed
- * change this only when you have changed the fps value.
- * 5 === 30FPS
- * 2.5 === 60FPS
- * 1.25 === 120FPS
- * Yes, wallpaper is frameRate dependent.
- * I tried making it independent of FPS but it caused some errors, and easy way out was leaving it as is.
- * Will I fix this in future?
- * Ans: Maybe, Maybe Not.
- */
-const movementSpeed = 2.5;
+let movementSpeed = 2.5;
 const easingFactor = 0.1; /* You could leave this as is or try to play with this if you want to. */
 const snapThreshold = 3;
 
@@ -50,6 +38,23 @@ let havePressedNatsuki = false;
 
 const blinkDuration = 45;
 let lastBlinkFrame = 0;
+let haveSentError = false;
+
+async function loadConfig() {
+  try {
+    const response = await fetch("./config.json");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const config = await response.json();
+    frameRates = config.fps;
+  } catch (error) {
+    console.error("Failed to load config:", error);
+  }
+}
+
+// Call the function to load the config
+loadConfig();
 
 /**
  * Similar to Unity'd Awake Method
@@ -72,35 +77,54 @@ function preload() {
   smileImage = loadImage("./public/Smile.webp");
   blushImage = loadImage("./public/Blush.webp");
   poutImage = loadImage("./public/Pout.webp");
+
   rightEyeImage = loadImage("./public/EyeRight.webp");
   leftEyeImage = loadImage("./public/EyeLeft.webp");
+
+  surprisedImage = loadImage("./public/surprised.webp");
 }
 
 /**
  * Similar to Unity's Start Method
  */
 function setup() {
+  screenWidth = windowWidth;
+  screenHeight = windowHeight;
+
+  imageWidth = smileImage.width;
+  imageHeight = smileImage.height;
+
   createCanvas(screenWidth, screenHeight);
 
-  smileImage.resize(screenWidth, screenHeight);
-  blushImage.resize(screenWidth, screenHeight);
-  poutImage.resize(screenWidth, screenHeight);
-  rightEyeImage.resize(screenWidth, screenHeight);
-  leftEyeImage.resize(screenWidth, screenHeight);
-  bothEyesCloseImage.resize(screenWidth, screenHeight);
-  rightEyeClosed.resize(screenWidth, screenHeight);
-  leftEyeClosed.resize(screenWidth, screenHeight);
+  let screenAspectRatio = windowWidth / windowHeight;
+  let imageAspectRatio = imageWidth / imageHeight;
 
-  leftEyeSprit = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
+  let scaleFactor;
+  if (screenAspectRatio > imageAspectRatio) {
+    scaleFactor = windowHeight / imageHeight;
+  } else {
+    scaleFactor = windowWidth / imageWidth;
+  }
 
-  leftEyeSprit.addImage(leftEyeImage);
+  poutImage.resize(poutImage.width * scaleFactor, poutImage.height * scaleFactor);
+  smileImage.resize(smileImage.width * scaleFactor, smileImage.height * scaleFactor);
+  blushImage.resize(blushImage.width * scaleFactor, blushImage.height * scaleFactor);
+  leftEyeImage.resize(leftEyeImage.width * scaleFactor, leftEyeImage.height * scaleFactor);
+  rightEyeImage.resize(rightEyeImage.width * scaleFactor, rightEyeImage.height * scaleFactor);
+  leftEyeClosed.resize(leftEyeClosed.width * scaleFactor, leftEyeClosed.height * scaleFactor);
+  rightEyeClosed.resize(rightEyeClosed.width * scaleFactor, rightEyeClosed.height * scaleFactor);
+  surprisedImage.resize(surprisedImage.width * scaleFactor, surprisedImage.height * scaleFactor);
+  bothEyesCloseImage.resize(bothEyesCloseImage.width * scaleFactor, bothEyesCloseImage.height * scaleFactor);
+
+  leftEyeSprite = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
+  leftEyeSprite.addImage(leftEyeImage);
 
   rightEyeSprite = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
   rightEyeSprite.addImage(rightEyeImage);
 
   baseSprite = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
   baseSprite.addAnimation("stare", stareAnime);
-  baseSprite.scale = screenWidth / imageWidth;
+  baseSprite.scale = scaleFactor;
 
   smileSprite = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
   smileSprite.addImage(smileImage);
@@ -109,20 +133,31 @@ function setup() {
   facialExpression = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
   facialExpression.visible = false;
 
-  faceTrigger = createSprite(screenWidth / 2 + 225, screenHeight / 2 + 100, 150, 150);
+  surprisedTrigger = createSprite(screenWidth / 2, screenHeight / 2, screenWidth, screenHeight);
+  surprisedTrigger.mouseActive = true;
+  surprisedTrigger.visible = false;
+
+  faceTrigger = createSprite(screenWidth * (935 / 1366), screenHeight * (440 / 768), 250, 235);
   faceTrigger.mouseActive = true;
+  faceTrigger.rotation = -45;
   faceTrigger.visible = false;
 
-  leftEyeTrigger = createSprite(screenWidth / 2 + 115, screenHeight / 2 + 75, 50, 50);
+  leftEyeTrigger = createSprite(screenWidth * (800 / 1366), screenHeight * (445 / 768), 60, 60);
+  leftEyeTrigger.scale = Math.min(screenWidth / 1366, screenHeight / 768);
   leftEyeTrigger.mouseActive = true;
+  leftEyeTrigger.rotation = -45;
   leftEyeTrigger.visible = false;
 
-  rightEyeTrigger = createSprite(screenWidth / 2 + 280, screenHeight / 2 - 10, 60, 60);
+  rightEyeTrigger = createSprite(screenWidth * (970 / 1366), screenHeight * (355 / 768), 60, 60);
+  rightEyeTrigger.scale = Math.min(screenWidth / 1366, screenHeight / 768);
   rightEyeTrigger.mouseActive = true;
+  rightEyeTrigger.rotation = -45;
   rightEyeTrigger.visible = false;
 
-  headTrigger = createSprite(screenWidth / 2 + 150, screenHeight / 2 - 170, 350, 200);
+  headTrigger = createSprite(screenWidth * (800 / 1366), screenHeight * (214 / 768), 450, 235);
+  headTrigger.scale = Math.min(screenWidth / 1366, screenHeight / 768);
   headTrigger.mouseActive = true;
+  headTrigger.rotation = -45;
   headTrigger.visible = false;
 
   screenCenter = createSprite(screenWidth / 2, screenHeight / 2, 50, 50);
@@ -134,17 +169,32 @@ function setup() {
  * Similar to Unity's Update Method
  */
 function draw() {
-  frameRate(framerates);
-  drawSprites();
-
-  Blink();
-  HandleMoutAnimation();
+  EyeBlinking();
+  HandleEyeAnimation();
+  HandleMouthAnimation();
   HandleLeftEyeMovement();
   HandleRightEyeMovement();
-  HandleEyeAnimation();
+
+  if (frameRates === 30) {
+    frameRate(30);
+    movementSpeed = 5;
+  } else if (frameRates === 60) {
+    frameRate(60);
+    movementSpeed = 2.5;
+  } else if (frameRates === 120) {
+    frameRate(120);
+    movementSpeed = 1.25;
+  } else if ((frameRates > 120 || frameRates < 30) && !haveSentError) {
+    console.error(
+      `${frameRates}fps is not officially supported.\n And why would anyone even want a ${frameRates}fps wallpaper?`
+    );
+    haveSentError = true;
+    frameRate(60);
+    movementSpeed = 2.5;
+  }
+  drawSprites();
 }
 
-//#region custom made functions
 function HandleEyeAnimation() {
   if (headTrigger.mouseIsPressed) {
     facialExpression.visible = true;
@@ -160,7 +210,7 @@ function HandleEyeAnimation() {
   }
 }
 
-function HandleMoutAnimation() {
+function HandleMouthAnimation() {
   if (faceTrigger.mouseIsOver) {
     if (havePressedNatsuki) {
       currentImage = poutImage;
@@ -175,6 +225,11 @@ function HandleMoutAnimation() {
       currentImage = smileImage;
       havePressedNatsuki = false;
     }
+
+    if (surprisedTrigger.mouseIsPressed && !havePressedNatsuki) {
+      currentImage = surprisedImage;
+      hoverExitTime = millis();
+    }
   }
 
   smileSprite.addImage(currentImage);
@@ -185,7 +240,7 @@ function HandleMoutAnimation() {
   }
 }
 
-function Blink() {
+function EyeBlinking() {
   if (frameCount % 360 === 0 && frameCount !== lastBlinkFrame) {
     baseSprite.addAnimation("stare", blinkAnime);
     lastBlinkFrame = frameCount;
@@ -241,20 +296,20 @@ function HandleRightEyeMovement() {
 }
 
 function HandleLeftEyeMovement() {
-  let mouseXRel = mouseX - leftEyeSprit.position.x;
-  let mouseYRel = mouseY - leftEyeSprit.position.y;
+  let mouseXRel = mouseX - leftEyeSprite.position.x;
+  let mouseYRel = mouseY - leftEyeSprite.position.y;
 
   let distance = dist(0, 0, mouseXRel, mouseYRel);
 
   let maxDistance = Math.sqrt(maxLeftEyeMovementX ** 2 + maxLeftEyeMovementY ** 2);
 
   if (screenCenter.mouseIsOver || havePressedNatsuki || faceTrigger.mouseIsOver || rightEyeTrigger.mouseIsOver) {
-    leftEyeSprit.position.x += (screenWidth / 2 - leftEyeSprit.position.x) * movementSpeed * easingFactor;
-    leftEyeSprit.position.y += (screenHeight / 2 - leftEyeSprit.position.y) * movementSpeed * easingFactor;
+    leftEyeSprite.position.x += (screenWidth / 2 - leftEyeSprite.position.x) * movementSpeed * easingFactor;
+    leftEyeSprite.position.y += (screenHeight / 2 - leftEyeSprite.position.y) * movementSpeed * easingFactor;
 
-    if (dist(leftEyeSprit.position.x, leftEyeSprit.position.y, screenWidth / 2, screenHeight / 2) <= snapThreshold) {
-      leftEyeSprit.position.x = screenWidth / 2;
-      leftEyeSprit.position.y = screenHeight / 2;
+    if (dist(leftEyeSprite.position.x, leftEyeSprite.position.y, screenWidth / 2, screenHeight / 2) <= snapThreshold) {
+      leftEyeSprite.position.x = screenWidth / 2;
+      leftEyeSprite.position.y = screenHeight / 2;
     }
 
     return;
@@ -266,19 +321,18 @@ function HandleLeftEyeMovement() {
       mouseYRel = (mouseYRel / distance) * maxDistance;
     }
 
-    leftEyeSprit.position.x += mouseXRel * movementSpeed;
-    leftEyeSprit.position.y += mouseYRel * movementSpeed;
+    leftEyeSprite.position.x += mouseXRel * movementSpeed;
+    leftEyeSprite.position.y += mouseYRel * movementSpeed;
 
-    leftEyeSprit.position.x = constrain(
-      leftEyeSprit.position.x,
+    leftEyeSprite.position.x = constrain(
+      leftEyeSprite.position.x,
       screenWidth / 2 - maxLeftEyeMovementX - 18,
       screenWidth / 2 + maxLeftEyeMovementX
     );
-    leftEyeSprit.position.y = constrain(
-      leftEyeSprit.position.y,
+    leftEyeSprite.position.y = constrain(
+      leftEyeSprite.position.y,
       screenHeight / 2 - maxLeftEyeMovementY,
       screenHeight / 2 + maxLeftEyeMovementY
     );
   }
 }
-//#endregion
