@@ -28,7 +28,7 @@
   - Hover to the left side of the wallpaper to access the menu
 - Eye Blink animation
 - Facial Expresions (Pout, Blush, Smile and Surprised)
-- Variable Refresh Rate Support (change it inside code)
+- Variable Refresh Rate Support (change it inside config file)
 - Auto Resolution Scaling
 - Windows/Linux Support, idk about MacOS tho :(
 
@@ -52,7 +52,9 @@
    6. You are good to **GO!**
 
 ## Changelog:
+
 ### Version - 0.7.0
+
 - Fixed several spelling mistakes and typos across the entire project.
 - Fixed several bad image editing artifacts.
 - Added support for all 16:9 ratio displays
@@ -62,6 +64,7 @@
   - Automatically determines which one will provide the best looking result and use that instead.
 - Reduced the size from 12.7mb to just 6.4mb `Nearly 50%` while extending functionality.
 - Added a config.json file for easy editing of the values.
+- Wallpaper is mostly frameRate independent now (Only for 30, 60 and 120).
 
 Also I am considering a Natsuki Live wallpaper for Mobile/Android devices as well, which will have toned down interaction as well. This was originally suggested by [u/Superb_Temporary_258](https://www.reddit.com/user/Superb_Temporary_258/) from DDLC subreddit. Since I lack the technical skills and a development device that could handle Android Studio, so I can't make it right now but maybe in the future.
 
